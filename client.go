@@ -11,6 +11,9 @@ const (
 	NUMERIC     = aerospike.NUMERIC
 	CREATE_ONLY = aerospike.CREATE_ONLY
 	WRITE       = aerospike.WRITE
+	LOW         = aerospike.LOW
+	MEDIUM      = aerospike.MEDIUM
+	HIGHT       = aerospike.HIGH
 )
 
 type Client struct {
@@ -30,21 +33,31 @@ func NewBin(name string, val interface{}) *aerospike.Bin {
 	return aerospike.NewBin(name, val)
 }
 
-func NewKey(ns, set string, key interface{}) (*aerospike.Key, error) {
-	k, err := aerospike.NewKey(ns, set, key)
-	if err != nil {
-		return nil, errors2.NewInternal(err.Error())
-	}
+func NewKey(ns, set string, key interface{}) *aerospike.Key {
+	k, _ := aerospike.NewKey(ns, set, key)
 
-	return k, nil
+	return k
 }
 
 func NewArrayKeys(size int) []*aerospike.Key {
 	return make([]*aerospike.Key, size)
 }
 
+func NewKeys(ns, set string, key ...string) []*aerospike.Key {
+	keys := make([]*aerospike.Key, len(key))
+	for i := 0; i < len(key); i++ {
+		keys[i], _ = aerospike.NewKey(ns, set, key[i])
+	}
+
+	return keys
+}
+
 func NewWritePolicy(generation, expiration int32) *aerospike.WritePolicy {
 	return aerospike.NewWritePolicy(generation, expiration)
+}
+
+func NewScanPolicy() *aerospike.ScanPolicy {
+	return aerospike.NewScanPolicy()
 }
 
 func NewPolicy() *aerospike.BasePolicy {
