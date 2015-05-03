@@ -1,6 +1,7 @@
 package aero
 
 import (
+	"github.com/Sirupsen/logrus"
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/plimble/utils/errors2"
 	"github.com/tinylib/msgp/msgp"
@@ -22,7 +23,9 @@ type Client struct {
 
 func NewClient(hostname string, port int) *Client {
 	client, err := aerospike.NewClient(hostname, port)
-	errors2.Panic(err)
+	if err != nil {
+		logrus.Warn(err.Error())
+	}
 
 	return &Client{
 		Client: client,
