@@ -5,6 +5,7 @@ import (
 	"github.com/aerospike/aerospike-client-go"
 	"github.com/plimble/utils/errors2"
 	"github.com/tinylib/msgp/msgp"
+	"time"
 )
 
 const (
@@ -22,9 +23,20 @@ type Client struct {
 }
 
 func NewClient(hostname string, port int) *Client {
-	client, err := aerospike.NewClient(hostname, port)
-	if err != nil {
-		logrus.Warn(err.Error())
+	var client *aerospike.Client
+	var err error
+
+	for i := 0; i < 5; i++ {
+		logrus.Info("Try to connect aerospike...")
+		client, err = aerospike.NewClient(hostname, port)
+		if err != nil {
+			logrus.Warnf("Try #%d: %s", i, err.Error())
+		} else {
+			logrus.Info("Aerospike Connected")
+			break
+		}
+
+		time.Sleep(time.Second * 2)
 	}
 
 	return &Client{
